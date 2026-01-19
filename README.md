@@ -3,7 +3,7 @@
 A persistent, containerized environment for GemStone/S 64 Bit (v3.7.4.3). This setup includes automated initialization of the extent, correct handling of shared memory, and a configured NetLDI for remote access.
 
 ## Notes regarding versioning
-* The version should be only listed in one spot in the Dockerfile. Check (GemStone's website)[https://gemtalksystems.com/products/gs64/] for the 
+* The version should be only listed in one spot in the Dockerfile. Check [GemStone's website](https://gemtalksystems.com/products/gs64/) for the 
 * correct version to use. If the version does not exist the script will fail with an HTTP error (403 probably).
 
 ## Features
