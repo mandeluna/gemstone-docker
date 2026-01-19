@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  gemstone:
+    build: .
+    container_name: gemstone
+    
+    # Critical: GemStone requires significant shared memory.
+    # The default Docker limit (64MB) is insufficient.
+    shm_size: 2g
+    
+    # Critical: GemStone needs permission to lock memory and manage system resources.
+    cap_add:
+      - SYS_RESOURCE
+      - IPC_LOCK
+      
+    # Expose the NetLDI port (50377).
+    # If you plan to attach remote Gems, you may need to expose a range 
+    # (e.g., "50378-50400:50378-50400").
+    ports:
+      - "50377:50377"
+      - "50378-50400:50378-50400"
+      
+    # Persist the database data to a local folder named 'gemstone-data'
+    volumes:
+      - ./gemstone-data:/opt/gemstone/data
+      
+    # Restart policy
+    restart: unless-stopped
