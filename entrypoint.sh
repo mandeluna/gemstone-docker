@@ -42,16 +42,25 @@ fi
 
 # --- 3. Cleanup Stale Locks ---
 if [ -f "$DATA_DIR/gs64stone.conf" ]; then
-    echo "Warning: Lock file found. Attempting to clear stale locks..."
-    # Optional: rm "$DATA_DIR/gs64stone.conf"
+    echo "Warning: Stale stone lock found. Removing..."
+    rm -f "$DATA_DIR/gs64stone.conf"
 fi
 
 # --- 4. Start NetLDI
 echo "--- Starting NetLDI ---"
-# NetLDI listens on port 50378 by default.
-# We run it in the background (daemon mode is default for startnetldi).
-gosu gemstone startnetldi
+# Stop any stale NetLDI from a previous container run. Docker restart reuses the
+# container's writable layer, so lock files in $LOCK_DIR survive across restarts,
+# causing startnetldi to report "already running" against a dead process.
+gosu gemstone stopnetldi gs64ldi 2>/dev/null || true
+rm -f "$LOCK_DIR"/gs64ldi* 2>/dev/null || true
+gosu gemstone startnetldi -P 10500 -g
 
 # --- 5. Start the Stone ---
+# Stop any stale stone and remove its lock file. Like NetLDI, the stone's lock
+# file in $LOCK_DIR survives Docker restarts (writable layer is reused), causing
+# startstone to report "already exists but is not responding" against a dead process.
+gosu gemstone stopstone "$GEMSTONE_NAME" 2>/dev/null || true
+rm -f "$LOCK_DIR"/${GEMSTONE_NAME}* 2>/dev/null || true
+
 # Switch to 'gemstone' user, start the stone with -z flag, and tail the log
 exec gosu gemstone bash -c "startstone -z $CONFIG_FILE $GEMSTONE_NAME && tail -f $DATA_DIR/${GEMSTONE_NAME}.log"

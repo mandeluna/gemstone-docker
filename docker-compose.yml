@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   gemstone:
     build: .
@@ -18,8 +16,8 @@ services:
     # If you plan to attach remote Gems, you may need to expose a range 
     # (e.g., "50378-50400:50378-50400").
     ports:
-      - "50377:50377"
-      - "50378-50400:50378-50400"
+      - "10500:10500"
+      - "10501-10524:10501-10524"
       
     # Persist the database data to a local folder named 'gemstone-data'
     volumes:
